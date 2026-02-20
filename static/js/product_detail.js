@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		return;
 	}
 
-	// If user clicked "checkout" button, we allow normal POST+redirect.
+	// Ako je korisnik kliknuo "checkout" gumb, dopusti normalan POST + redirect.
 	const checkoutFlag = document.getElementById('checkoutFlag');
 
-	// Elements
+	// Elementi
 	const quantityInput = document.getElementById('id_quantity');
 	const totalElement = document.getElementById('orderTotal');
 	const sizeDisplay = document.getElementById('selectedSize');
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const colorDisplay = document.getElementById('selectedColor');
 	const unitPrice = totalElement ? parseFloat(totalElement.dataset.unitPrice) : 0;
 
-	// Payment fields (checkout page only)
+	// Polja plaćanja (samo na checkout stranici)
 	const paymentSelect = document.getElementById('id_payment_method');
 	const paypalFields = document.getElementById('paypalFields');
 	const cardFields = document.getElementById('cardFields');
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const cardExpiryInput = document.getElementById('id_card_expiry');
 	const cardCvvInput = document.getElementById('id_card_cvv');
 
-	// Utility functions
+	// Pomoćne funkcije
 	const digitsOnly = (value) => (value || '').replace(/\D/g, '');
 	const formatEuro = (value) => `${value.toFixed(2)} €`;
 
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (sizeDisplay) {
 			sizeDisplay.textContent = checkedInput ? checkedInput.value : '-';
 		}
-		// Update active class on labels
+		// Ažuriraj aktivnu klasu na labelima
 		document.querySelectorAll('.size-option').forEach((label) => {
 			const inputId = label.getAttribute('for');
 			const input = inputId ? document.getElementById(inputId) : null;
@@ -59,15 +59,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	};
 
 	const initSizeSelection = () => {
-		// With proper <label for="..."> association, the browser will toggle
-		// the radio automatically. We just keep the UI state in sync.
-		// Listen for change events on inputs.
+		// Uz ispravno <label for="..."> povezivanje, browser sam toggla radio.
+		// Mi samo držimo UI stanje usklađeno.
+		// Slušaj change evente na inputima.
 		document.querySelectorAll('input[name="size"]').forEach((input) => {
 			input.addEventListener('change', updateSizeDisplay);
 		});
 
-		// Extra robustness: in case dynamic nodes are added or labels are clicked in a
-		// way that doesn't trigger per-input listeners, listen on the container too.
+		// Dodatna robusnost: ako se elementi dinamički dodaju ili klik na label
+		// ne okine listener na pojedinom inputu, slušaj i na containeru.
 		const container = document.getElementById('sizeOptions');
 		if (container) {
 			container.addEventListener('change', (e) => {
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		}
 
-		// Initial update
+		// Početno stanje
 		updateSizeDisplay();
 	};
 
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		totalElement.textContent = formatEuro(unitPrice * qty);
 	};
 
-	// ========== PAYMENT FIELDS (checkout) ==========
+	// ========== POLJA PLAĆANJA (checkout) ==========
 	const setRequired = (el, required) => {
 		if (!el) return;
 		if (required) {
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		setRequired(cardCvvInput, method === 'card');
 	};
 
-	// ========== INITIALIZATION ==========
+	// ========== INICIJALIZACIJA ==========
 
 	// ========== IMAGE LIGHTBOX (product detail) ==========
 	const imageBtn = document.getElementById('productImageBtn');
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!imageModal) return;
 		imageModal.classList.remove('hidden');
 		imageModal.classList.add('flex');
-		// Prevent background scroll
+		// Spriječi scroll u pozadini
 		document.body.style.overflow = 'hidden';
 	};
 
@@ -158,13 +158,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		imageModalClose.addEventListener('click', closeImageModal);
 	}
 	if (imageModal) {
-		// Click outside image closes
+		// Klik izvan slike zatvara
 		imageModal.addEventListener('click', (e) => {
 			if (e.target === imageModal) {
 				closeImageModal();
 			}
 		});
-		// Escape closes
+		// Escape zatvara
 		document.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape' && !imageModal.classList.contains('hidden')) {
 				closeImageModal();
@@ -172,29 +172,29 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 	
-	// Size selection
+	// Odabir veličine
 	initSizeSelection();
 
-	// Color selection
+	// Odabir boje
 	if (colorSelect) {
 		colorSelect.addEventListener('change', updateColorDisplay);
 		updateColorDisplay();
 	}
 
-	// Quantity & total
+	// Količina i ukupno
 	if (quantityInput) {
 		quantityInput.addEventListener('input', updateTotal);
 		quantityInput.addEventListener('blur', updateTotal);
 	}
 	updateTotal();
 
-	// Payment method toggle (checkout page)
+	// Toggle metode plaćanja (checkout stranica)
 	if (paymentSelect) {
 		paymentSelect.addEventListener('change', updatePaymentFields);
 		updatePaymentFields();
 	}
 
-	// Card input formatting
+	// Formatiranje unosa kartice
 	if (cardExpiryInput) {
 		cardExpiryInput.addEventListener('input', () => {
 			const formatted = formatExpiry(cardExpiryInput.value);

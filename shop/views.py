@@ -34,8 +34,7 @@ def logout_view(request):
 
 
 def generate_order_number() -> str:
-	# Generira kratki i čitljiv broj narudžbe koji se koristi kao grupni ID za checkout.
-	# Example: PS-9F3A1C2B
+	# Generira kratki broj narudžbe, npr. PS-9F3A1C2B
 	return f"PS-{uuid4().hex[:8].upper()}"
 
 
@@ -232,14 +231,14 @@ def product_detail(request, pk):
             )
             messages.success(request, f"Dodano u košaricu: {product.title} (veličina {cleaned.get('size')})")
 
-            # Redirect based on action
+            # Preusmjeravanje ovisno o akciji
             if action == 'checkout' and request.user.is_authenticated:
                 return redirect('checkout')
             if action == 'checkout':
                 login_url = f"{reverse('login')}?next={reverse('checkout')}"
                 return redirect(login_url)
             return redirect('cart_detail')
-        # If invalid, fall through and re-render with errors.
+        # Ako forma nije validna, ponovo renderaj stranicu s greškama.
 
     context = {
         'product': product,
@@ -266,10 +265,10 @@ def cart_add(request, pk: int):
 				},
 				status=400,
 			)
-		# Re-render product page with errors and preserve user selections.
+		# Ponovo renderaj stranicu proizvoda s greškama i sačuvaj korisnikov odabir.
 		related_products = Product.objects.exclude(pk=product.pk).order_by('-created_at')[:4]
 		product_form = ProductOrderForm(request.POST, mode='product')
-		# Inject field errors from AddToCartForm into product_form equivalents.
+		# Prebaci greške iz AddToCartForm u odgovarajuća polja product_form-e.
 		for field in ['size', 'color', 'quantity']:
 			if field in form.errors and field in product_form.fields:
 				product_form.add_error(field, form.errors[field])
@@ -365,7 +364,7 @@ def checkout(request):
 			card_brand = ''
 			card_last4 = ''
 			if payment_method == 'card':
-				# forms.py normalizes card_number to digits-only
+				# forms.py normalizira broj kartice na samo znamenke
 				card_number = (cleaned.get('card_number') or '').strip()
 				card_last4 = card_number[-4:] if len(card_number) >= 4 else ''
 				if card_number.startswith('4'):
@@ -375,8 +374,7 @@ def checkout(request):
 				else:
 					card_brand = 'Card'
 
-			# Create one checkout group (one order_number) with multiple Order rows.
-			# This keeps the current model structure but makes confirmation show *all* items.
+			# Kreira jednu grupu narudžbe (jedan order_number) s više Order redova.
 			order_number = generate_order_number()
 			while Order.objects.filter(order_number=order_number).exists():
 				order_number = generate_order_number()
@@ -406,7 +404,7 @@ def checkout(request):
 
 			cart.clear()
 			messages.success(request, 'Hvala! Narudžba je kreirana.')
-			# Redirect to confirmation page for the checkout group
+			# Preusmjeri na stranicu potvrde narudžbe
 			return redirect('order_confirmation', order_number=order_number)
 	else:
 		form = ProductOrderForm(mode='checkout')
@@ -432,7 +430,7 @@ def order_confirmation(request, order_number):
 	if not orders:
 		return redirect('home')
 
-	# All rows should belong to the same user; still enforce ownership.
+	# Svi redovi pripadaju istom korisniku; provjera vlasništva.
 	if any(o.user_id != request.user.id for o in orders):
 		messages.error(request, 'Nemaš pristup ovoj narudžbi.')
 		return redirect('home')
@@ -453,14 +451,13 @@ def order_confirmation(request, order_number):
 
 @login_required
 def my_orders(request):
-	# One row per checkout group (order_number), newest first.
+	# Jedan red po grupi narudžbe (order_number), najnovije prvo.
 	orders = (
 		Order.objects.filter(user=request.user)
 		.order_by('-created_at', '-id')
 		.distinct('order_number')
 	)
 	# distinct('field') radi samo na PostgreSQL-u; za SQLite radimo ručno grupiranje.
-	# Fallback: if the DB doesn't support it (e.g., SQLite), do manual grouping.
 	try:
 		list(orders[:1])
 		groups = list(orders)
@@ -508,7 +505,7 @@ def register(request):
 
 
 
-# Admin (custom) CRUD pages
+# Admin (prilagođene) CRUD stranice
 
 
 @admin_required
@@ -545,7 +542,7 @@ def admin_product_create(request):
 					destination_path=destination,
 					content_type=getattr(uploaded, 'content_type', None),
 				)
-				# Prefer Firebase URL going forward.
+				# Koristi Firebase URL umjesto lokalnog fajla.
 				product.image = None
 			product.save()
 			messages.success(request, 'Proizvod je kreiran.')

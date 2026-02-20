@@ -19,8 +19,8 @@ class ProductAdminForm(forms.ModelForm):
 
         brand_field = self.fields.get('brand')
         if brand_field:
-            # Force a deterministic select dropdown for brand.
-            # (Some browsers/templates may render it as a text input otherwise.)
+            # Forsiraj deterministički dropdown (Select) za brand.
+            # (Neki browseri/templateovi ga inače mogu prikazati kao običan text input.)
             choices = list(BRAND_CHOICES)
 
             current_value = None
@@ -35,14 +35,14 @@ class ProductAdminForm(forms.ModelForm):
             brand_field.choices = choices
             brand_field.widget = forms.Select(choices=choices)
 
-        # Tailwind design-system classes:
-        # - .input is defined in frontend/src/tailwind.css and compiled into static/css/tailwind.css
+        # Tailwind design-system klase:
+        # - .input je definiran u frontend/src/tailwind.css i kompajliran u static/css/tailwind.css
         input_class = 'input'
         file_class = 'block w-full text-sm text-slate-700 file:mr-4 file:rounded-full file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-900 hover:file:bg-slate-200'
 
         for name, field in self.fields.items():
             widget = field.widget
-            # Skip RadioSelect etc (none in this form), but keep it future-proof.
+            # Preskoči RadioSelect itd. (trenutno ih nema u ovoj formi), ali ostavi robusno za ubuduće.
             if isinstance(widget, (forms.CheckboxInput, forms.RadioSelect)):
                 continue
             if isinstance(widget, forms.ClearableFileInput):

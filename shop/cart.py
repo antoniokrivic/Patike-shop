@@ -15,7 +15,7 @@ class CartItemData(TypedDict):
     size: str
     color: str
     quantity: int
-    unit_price: str  # stored as string for JSON/session safety
+    unit_price: str  # sprema se kao string radi JSON/session kompatibilnosti
 
 
 @dataclass(frozen=True)

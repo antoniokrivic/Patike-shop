@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = 'Seed the database with sample sneakers across multiple brands'
+    help = 'Napuni bazu testnim patikama (više brandova)'
 
     def handle(self, *args, **options):
         from shop.models import Product

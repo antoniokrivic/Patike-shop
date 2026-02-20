@@ -32,7 +32,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add Bootstrap form-control class to all fields
+        # Dodaj Bootstrap form-control klasu na sva polja
         for field_name, field in self.fields.items():
             existing = field.widget.attrs.get('class', '')
             classes = (existing + ' form-control').strip()
@@ -57,7 +57,7 @@ class ProductOrderForm(forms.Form):
     delivery_method = forms.ChoiceField(choices=DELIVERY_CHOICES, label='Dostava', initial='standard')
     payment_method = forms.ChoiceField(choices=PAYMENT_CHOICES, label='Plaćanje', initial='cod')
 
-    # Conditional payment details (shown/required depending on payment_method)
+    # Uvjetni podaci o plaćanju (prikazani/obavezni ovisno o payment_method)
     paypal_email = forms.EmailField(required=False, label='PayPal email')
     cardholder_name = forms.CharField(required=False, max_length=120, label='Ime i prezime na kartici')
     card_number = forms.CharField(required=False, max_length=19, label='Broj kartice', help_text='Upiši samo brojeve (16 znamenki)')
@@ -68,14 +68,14 @@ class ProductOrderForm(forms.Form):
     agree_terms = forms.BooleanField(label='Prihvaćam uvjete kupovine')
 
     def __init__(self, *args, **kwargs):
-        # mode='product' -> only validate product options for adding to cart
-        # mode='checkout' -> validate full checkout form
+        # mode='product' -> validira samo opcije proizvoda za dodavanje u košaricu
+        # mode='checkout' -> validira cijelu checkout formu
         mode = kwargs.pop('mode', 'checkout')
         super().__init__(*args, **kwargs)
 
         if mode == 'product':
-            # Product page should only validate size/color/quantity.
-            # Remove checkout-only fields entirely so they can't fail validation.
+            # Stranica proizvoda validira samo veličinu/boju/količinu.
+            # Ukloni checkout polja da ne padnu na validaciji.
             for name in [
                 'full_name',
                 'email',
@@ -96,8 +96,8 @@ class ProductOrderForm(forms.Form):
                 self.fields.pop(name, None)
 
         if mode == 'checkout':
-            # Cart items already contain size/color/quantity per item.
-            # The checkout form collects shipping/payment details only.
+            # Stavke košarice već sadrže veličinu/boju/količinu po stavci.
+            # Checkout forma prikuplja samo podatke o dostavi/plaćanju.
             for name in ['size', 'color', 'quantity']:
                 if name in self.fields:
                     self.fields[name].required = False
@@ -120,7 +120,7 @@ class ProductOrderForm(forms.Form):
         if 'quantity' in self.fields:
             self.fields['quantity'].widget.attrs.update({'min': 1, 'max': 10})
 
-        # Set basic input hints for conditional fields
+        # Postavi osnovne atribute za uvjetna polja
         if 'card_number' in self.fields:
             self.fields['card_number'].widget.attrs.update({'inputmode': 'numeric', 'autocomplete': 'cc-number'})
         if 'card_expiry' in self.fields:
@@ -134,12 +134,12 @@ class ProductOrderForm(forms.Form):
 
     def clean(self):
         cleaned = super().clean()
-        # Product page only has size/color/quantity.
+        # Stranica proizvoda ima samo veličinu/boju/količinu.
         if 'payment_method' not in self.fields:
             return cleaned
         payment_method = cleaned.get('payment_method')
 
-        # COD: no extra fields required
+        # Pouzeće: nema dodatnih polja
         if payment_method == 'cod':
             return cleaned
 
@@ -157,7 +157,7 @@ class ProductOrderForm(forms.Form):
             if not cardholder_name:
                 self.add_error('cardholder_name', 'Unesi ime na kartici.')
 
-            # Normalize card number to digits-only
+			# Normaliziraj broj kartice na samo znamenke
             card_number_digits = re.sub(r'\D', '', card_number_raw)
             if not card_number_digits:
                 self.add_error('card_number', 'Unesi broj kartice.')
@@ -178,6 +178,6 @@ class ProductOrderForm(forms.Form):
 
             return cleaned
 
-        # Unknown method: be strict
+		# Nepoznata metoda: budi strog i prikaži grešku
         self.add_error('payment_method', 'Nepoznata metoda plaćanja.')
         return cleaned

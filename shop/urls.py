@@ -7,7 +7,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
 	path('moje-narudzbe/', views.my_orders, name='my_orders'),
     path('products/<int:pk>/', views.product_detail, name='product_detail'),
-    # Custom admin CRUD
+	# Prilagođeni admin CRUD
     path('staff/products/', views.admin_product_list, name='admin_product_list'),
     path('staff/products/create/', views.admin_product_create, name='admin_product_create'),
     path('staff/products/<int:pk>/', views.admin_product_detail, name='admin_product_detail'),

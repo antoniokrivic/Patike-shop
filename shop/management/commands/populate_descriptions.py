@@ -76,7 +76,7 @@ def _pick(seed: str, options: list[str]) -> str:
 
 
 def _cleanup(text: str) -> str:
-	# Normalize whitespace, avoid double spaces.
+	# Normaliziraj whitespace i izbjegni duple razmake.
 	text = re.sub(r"\s+", " ", text).strip()
 	return text
 
@@ -147,7 +147,7 @@ def _build_description(title: str) -> str:
 		"kad želiš udobnu patiku koja ide uz sve",
 	]
 
-	# Category-specific wording to reduce repetition.
+	# Tekst specifičan po kategoriji da se smanji ponavljanje.
 	if profile.category == "running":
 		use_case = _pick(seed + "|use", use_cases_running)
 		mid = _pick(seed + "|mid", [

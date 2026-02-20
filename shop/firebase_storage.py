@@ -56,7 +56,7 @@ def _get_or_init_app(cfg: FirebaseStorageConfig) -> firebase_admin.App:
     _app = firebase_admin.initialize_app(
         cred,
         {
-            # Used by firebase_admin.storage.bucket() when name isn't provided.
+            # Koristi firebase_admin.storage.bucket() kad naziv bucket-a nije eksplicitno proslijeđen.
             "storageBucket": cfg.bucket_name,
         },
     )

@@ -84,7 +84,7 @@ class Order(models.Model):
 	postal_code = models.CharField(max_length=10)
 	delivery_method = models.CharField(max_length=30)
 	payment_method = models.CharField(max_length=30)
-	# Payment metadata (never store full PAN or CVV)
+	# Podaci o plaćanju (nikad ne spremati puni broj kartice/PAN niti CVV)
 	payment_card_brand = models.CharField(max_length=30, blank=True)
 	payment_card_last4 = models.CharField(max_length=4, blank=True)
 	notes = models.TextField(blank=True)

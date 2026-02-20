@@ -61,7 +61,7 @@ body { background: #f1f5f9; }
 .size-options .size-option.active { background: #0d6efd; color: #fff; border-color: #0d6efd; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25); }
 .size-options .size-option:focus-within { border-color: #0d6efd; box-shadow: 0 0 0 .15rem rgba(13, 110, 253, 0.25); }
 
-/* Size option active state (product detail page) */
+/* Aktivno stanje odabira veličine (detalj proizvoda) */
 .size-option.active { 
     background: #1e293b !important; 
     color: #fff !important; 
@@ -74,7 +74,7 @@ body { background: #f1f5f9; }
 .related-card { border-radius: 1rem; overflow: hidden; }
 .related-card .card-body { padding: 1rem 1.25rem 1.5rem; }
 
-/* Fallback button variants (in case Tailwind output isn't rebuilt yet). */
+/* Fallback varijante gumba (ako Tailwind output još nije rebuildan). */
 .btn-danger {
 	background: #dc2626; /* red-600 */
 	color: #fff;
@@ -84,7 +84,7 @@ body { background: #f1f5f9; }
 	background: #b91c1c; /* red-700 */
 }
 
-/* Fallback .input styling (mirrors Tailwind design-system) */
+/* Fallback .input stil (kopira Tailwind design-system) */
 .input {
 	display: block;
 	width: 100%;

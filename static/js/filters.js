@@ -36,13 +36,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const pct = sliderMax === sliderMin ? 0 : (value - sliderMin) / (sliderMax - sliderMin);
 		bubble.textContent = toEuro(value);
 
-		// Vertical spacing controlled via JS (user preference: not via HTML classes).
-		// Negative = move bubble up (more space from the slider).
+		// Vertikalni razmak kontrolira JS (preferenca: ne preko HTML classa).
+		// Veća vrijednost = mjehurić ide više gore (više razmaka od slidera).
 		const verticalOffsetPx = 12;
 		bubble.style.transform = `translateX(-50%) translateY(-${verticalOffsetPx}px)`;
 
-		// Position bubble centered above the thumb.
-		// Using real element widths is more stable than CSS calc hacks across browsers.
+		// Pozicioniraj mjehurić centriran iznad thumb-a.
+		// Korištenje stvarnih širina elemenata je stabilnije od CSS calc trikova kroz browsere.
 		const inputRect = input.getBoundingClientRect();
 		const bubbleRect = bubble.getBoundingClientRect();
 		const x = pct * inputRect.width;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const pulse = (el) => {
 		if (!el) return;
 		el.classList.remove('opacity-60', 'scale-[0.98]');
-		// force reflow so animation re-triggers even on rapid input
+		// forsiraj reflow da se animacija ponovo aktivira i kod brzog unosa
 		void el.offsetWidth;
 		el.classList.add('opacity-60', 'scale-[0.98]');
 		window.clearTimeout(el.__pulseTimeout);
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			el.classList.remove('opacity-60', 'scale-[0.98]');
 		}, 120);
 	};
-	// We intentionally don't render a "bubble" on the slider track.
+	// Namjerno ne renderamo "bubble" direktno na track slidera.
 
 	const syncValues = () => {
 		if (!slidersReady) {
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			minValueEl.textContent = toEuro(minValue);
 			pulse(minValueEl);
 		} else {
-			// fallback for older markup
+			// fallback za stariji markup
 			minSummary.textContent = `Odabrano: ${toEuro(minValue)}`;
 			pulse(minSummary);
 		}
@@ -111,18 +111,18 @@ document.addEventListener('DOMContentLoaded', function () {
 			hideBubble(bubble);
 		};
 
-		// Mouse/touch/pen unified
+		// Mouse/touch/pen (pointer events) ujedinjeno
 		input.addEventListener('pointerdown', start);
 		input.addEventListener('pointerup', end);
 		input.addEventListener('pointercancel', end);
 		input.addEventListener('blur', end);
 
-		// While dragging
+		// Dok se povlači
 		input.addEventListener('input', () => {
 			update();
 		});
 
-		// Ensure hidden by default even if CSS cached differently
+		// Osiguraj da je skriveno po defaultu čak i ako je CSS drugačije cache-an
 		end();
 	};
 

@@ -17,6 +17,9 @@ db.sqlite3
 *.log
 media/
 
+# Junk datoteke (slučajno dodane u prošlosti)
+ter
+jetljive datoteke iz trackinga*
 # Secrets (NIKADA ne commitati!)
 secrets/
 *.json

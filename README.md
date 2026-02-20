@@ -1,4 +1,4 @@
-# Patike Shop — kratke upute za pokretanje (Windows + Git Bash)
+# Patike Shop — kratke upute za pokretanje 
 
 Ovo su najvažniji koraci da projekt radi na novom ili postojećem računalu.
 

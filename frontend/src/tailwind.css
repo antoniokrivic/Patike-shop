@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply bg-slate-100 text-slate-900 antialiased;
+	}
+}
+
+@layer components {
+	.container-page {
+		@apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+	}
+
+	.btn {
+		@apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition;
+	}
+
+	.btn-primary {
+		@apply bg-ink-900 text-white hover:bg-black;
+	}
+
+	.btn-secondary {
+		@apply bg-white text-ink-900 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50;
+	}
+
+	.btn-ghost {
+		@apply bg-transparent text-ink-900 hover:bg-slate-100;
+	}
+
+	.btn-danger {
+		@apply bg-red-600 text-white hover:bg-red-700;
+	}
+
+	.card {
+		@apply rounded-3xl bg-white shadow-soft ring-1 ring-slate-100;
+	}
+
+	.input {
+		@apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-ink-900 focus:ring-2 focus:ring-ink-900/10;
+	}
+
+	.badge {
+		@apply inline-flex items-center rounded-full bg-ink-900 px-2.5 py-1 text-xs font-semibold text-white;
+	}
+
+	/* Active state for selected shoe size */
+	.size-option.active {
+		@apply border-ink-900 bg-black text-white shadow-lift;
+	}
+}
+

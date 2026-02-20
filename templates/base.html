@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patike Shop</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" crossorigin>
+    <!-- Tailwind (compiled) -->
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+  <!-- Legacy/custom CSS (optional overrides) -->
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<header class="sticky top-0 z-50 bg-white/85 backdrop-blur border-b border-slate-200">
+  <div class="container-page">
+    <div class="flex h-16 items-center justify-between">
+      <a href="{% url 'home' %}" class="flex items-center gap-2">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-ink-900 text-white font-black">PS</span>
+        <span class="font-semibold tracking-tight">Patike Shop</span>
+      </a>
+
+      <nav class="flex items-center gap-2">
+        <a class="btn btn-ghost" href="{% url 'home' %}">Katalog</a>
+
+        <a id="cartLink" class="btn btn-ghost relative" href="{% url 'cart_detail' %}">
+          Košarica
+          {% if cart_item_count and cart_item_count|add:0 > 0 %}
+            <span class="badge absolute -top-1 -right-1">{{ cart_item_count }}</span>
+          {% endif %}
+        </a>
+
+        {% if user.is_authenticated %}
+          {% if user.is_staff or user.is_superuser %}
+            <div class="relative" data-admin-menu>
+              <button type="button" class="btn btn-ghost" data-admin-menu-button aria-haspopup="menu" aria-expanded="false">Admin</button>
+              <div class="invisible opacity-0 translate-y-1 transition absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white shadow-lg p-2" data-admin-menu-panel role="menu">
+                <a class="block rounded-xl px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{% url 'admin_product_list' %}">Dashboard</a>
+                <a class="block rounded-xl px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href="/admin/">Django admin</a>
+              </div>
+            </div>
+          {% endif %}
+          <a class="btn btn-ghost" href="{% url 'my_orders' %}">Moje narudžbe</a>
+          <span class="hidden sm:inline text-sm text-slate-600">Pozdrav, <span class="font-semibold text-slate-900">{{ user.username }}</span></span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary">Logout</button>
+          </form>
+        {% else %}
+          <a class="btn btn-secondary" href="{% url 'login' %}">Prijava</a>
+          <a class="btn btn-primary" href="{% url 'register' %}">Registracija</a>
+        {% endif %}
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="container-page py-8">
+  <div id="toastContainer" class="space-y-2 mb-6"></div>
+  {% if messages %}
+    <div class="space-y-2 mb-6">
+      {% for message in messages %}
+        <div class="card px-5 py-4">
+          <div class="text-sm text-slate-700">{{ message }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="mt-10 border-t border-slate-200 bg-white/60 backdrop-blur">
+  <div class="container-page">
+  <div class="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="space-y-4">
+        <a href="{% url 'home' %}" class="inline-flex items-center gap-2">
+          <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-ink-900 text-white font-black">PS</span>
+          <span class="font-semibold tracking-tight text-slate-900">Patike Shop</span>
+        </a>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Premium kolekcija tenisica i obuće. Brza pretraga, jednostavna kupnja i moderan dizajn.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">Nike</span>
+          <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">Adidas</span>
+          <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">New Balance</span>
+          <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">Vans</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-500">Korisno</div>
+          <ul class="mt-4 space-y-2 text-sm text-slate-700">
+          <li><span class="text-slate-500">Dostava:</span> Standard / Express</li>
+          <li><span class="text-slate-500">Plaćanje:</span> Pouzećem / Kartica</li>
+          {% if user.is_staff or user.is_superuser %}
+            <li><a class="text-slate-700 hover:underline" href="{% url 'admin_product_list' %}">Dashboard</a></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="space-y-4 lg:col-span-2">
+        <div>
+          <div class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-500">Kontakt</div>
+          <div class="mt-4 space-y-2 text-sm text-slate-700">
+            <div><span class="text-slate-500">Email:</span> support@patikeshop.com</div>
+            <div><span class="text-slate-500">Lokacija:</span> Osijek, HR</div>
+          </div>
+        </div>
+
+        <div class="rounded-3xl bg-white p-4 ring-1 ring-slate-200 shadow-sm">
+          <div class="text-sm font-semibold text-slate-900">Newsletter</div>
+          <p class="mt-1 text-xs text-slate-500">Pretplati se za novosti.</p>
+          <form class="mt-3 flex gap-2" action="{% url 'newsletter_subscribe' %}" method="post">
+            {% csrf_token %}
+            <input class="input h-11 min-w-0 flex-1" type="email" name="email" placeholder="Email" autocomplete="email">
+            <button class="btn btn-primary h-11 px-4" type="submit">OK</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 border-t border-slate-200 py-6 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-xs text-slate-500">Made by A.K. 2025.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const root = document.querySelector('[data-admin-menu]');
+    if (!root) return;
+    const btn = root.querySelector('[data-admin-menu-button]');
+    const panel = root.querySelector('[data-admin-menu-panel]');
+    if (!btn || !panel) return;
+
+    const open = () => {
+      panel.classList.remove('invisible', 'opacity-0', 'translate-y-1');
+      panel.classList.add('visible', 'opacity-100', 'translate-y-0');
+      btn.setAttribute('aria-expanded', 'true');
+    };
+    const close = () => {
+      panel.classList.add('invisible', 'opacity-0', 'translate-y-1');
+      panel.classList.remove('visible', 'opacity-100', 'translate-y-0');
+      btn.setAttribute('aria-expanded', 'false');
+    };
+    const isOpen = () => btn.getAttribute('aria-expanded') === 'true';
+    const toggle = () => (isOpen() ? close() : open());
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggle();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!isOpen()) return;
+      if (root.contains(e.target)) return;
+      close();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+
+    // Ensure initial state
+    close();
+  })();
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

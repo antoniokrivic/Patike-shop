@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="relative overflow-hidden rounded-3xl bg-ink-900 text-white shadow-lift">
+    <div class="absolute inset-0 opacity-30" style="background: radial-gradient(1200px circle at 20% 0%, rgba(255,255,255,0.18), transparent 60%), radial-gradient(900px circle at 80% 10%, rgba(255,255,255,0.14), transparent 55%);"></div>
+    <div class="relative px-6 py-14 sm:px-10 sm:py-16">
+        <div class="max-w-2xl">
+            <p class="text-xs font-semibold tracking-[0.2em] text-white/70">PREMIUM SNEAKERS</p>
+            <h1 class="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Dobrodošli u Patike Shop</h1>
+            <p class="mt-4 text-white/80">Istraži premium kolekciju Nike, Adidas, Vans i New Balance obuće i pronađi model koji savršeno odgovara tvom stilu.</p>
+            <div class="mt-6 flex flex-wrap gap-3">
+                <a class="btn btn-primary bg-white text-ink-900 hover:bg-white/90" href="#katalog">Pregledaj katalog</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-10" id="katalog">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h2 class="text-xl font-bold tracking-tight">Pretraga i filteri</h2>
+            <p class="mt-1 text-sm text-slate-600">Suzite katalog po nazivu, brandu i rasponu cijene.</p>
+        </div>
+        <div>
+            <span class="badge">{{ result_count }} rezultata</span>
+        </div>
+    </div>
+
+    <form method="get" class="filter-form card mt-4 p-4">
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-end">
+            <div class="lg:col-span-4">
+                <label for="id_q" class="block text-xs font-semibold tracking-wide text-slate-700">Pretraga</label>
+                <input type="text" class="input mt-2" id="id_q" name="q" placeholder="Traži omiljeni model ili brand" value="{{ search_query }}">
+            </div>
+            <div class="lg:col-span-2">
+                <label for="id_brand" class="block text-xs font-semibold tracking-wide text-slate-700">Brand</label>
+                <select class="input mt-2" id="id_brand" name="brand">
+                    <option value="">Svi brandovi</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand }}" {% if brand == selected_brand %}selected{% endif %}>{{ brand }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="lg:col-span-3">
+                <label for="id_price_min" class="block text-xs font-semibold tracking-wide text-slate-700">Cijena od (€)</label>
+                <div class="mt-3">
+                    <div class="relative pt-8 pb-2">
+                        <span id="priceMinBubble" class="pointer-events-none absolute left-0 top-0 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink-900 px-2 py-0.5 text-[11px] font-semibold text-white shadow-sm opacity-0 scale-95 transition duration-150">
+                            {{ price_min_value }} €
+                        </span>
+                        <input type="range" id="id_price_min" name="price_min" min="{{ price_slider_min }}" max="{{ price_slider_max }}" step="1" value="{{ price_min_value }}" class="w-full accent-black">
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+                        <span>Min: {{ price_slider_min }} €</span>
+                        <span id="priceMinSummary" class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-700 transition">Odabrano: <span id="priceMinValue" class="text-ink-900">{{ price_min_value }} €</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-3">
+                <label for="id_price_max" class="block text-xs font-semibold tracking-wide text-slate-700">Cijena do (€)</label>
+                <div class="mt-3">
+                    <div class="relative pt-8 pb-2">
+                        <span id="priceMaxBubble" class="pointer-events-none absolute left-0 top-0 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink-900 px-2 py-0.5 text-[11px] font-semibold text-white shadow-sm opacity-0 scale-95 transition duration-150">
+                            {{ price_max_value }} €
+                        </span>
+                        <input type="range" id="id_price_max" name="price_max" min="{{ price_slider_min }}" max="{{ price_slider_max }}" step="1" value="{{ price_max_value }}" class="w-full accent-black">
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+                        <span id="priceMaxSummary" class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-700 transition">Odabrano: <span id="priceMaxValue" class="text-ink-900">{{ price_max_value }} €</span></span>
+                        <span>Max: {{ price_slider_max }} €</span>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-2">
+                <label for="id_sort" class="block text-xs font-semibold tracking-wide text-slate-700">Sortiraj</label>
+                <select class="input mt-2" id="id_sort" name="sort">
+                    <option value="newest" {% if sort_option == 'newest' %}selected{% endif %}>Najnovije</option>
+                    <option value="oldest" {% if sort_option == 'oldest' %}selected{% endif %}>Najstarije</option>
+                    <option value="price_low_high" {% if sort_option == 'price_low_high' %}selected{% endif %}>Cijena: rastuće</option>
+                    <option value="price_high_low" {% if sort_option == 'price_high_low' %}selected{% endif %}>Cijena: padajuće</option>
+                    <option value="title_az" {% if sort_option == 'title_az' %}selected{% endif %}>Naziv A-Z</option>
+                    <option value="title_za" {% if sort_option == 'title_za' %}selected{% endif %}>Naziv Z-A</option>
+                </select>
+            </div>
+            <div class="lg:col-span-2 flex gap-2">
+                <button type="submit" class="btn btn-primary w-full">Primijeni</button>
+                <button type="button" class="btn btn-secondary w-full" id="resetFilters">Izbriši</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {% if products %}
+            {% for product in products %}
+                <a href="{% url 'product_detail' product.pk %}" class="group card overflow-hidden">
+                    <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+                        <img src="{{ product.primary_image_url }}" alt="{{ product.title }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="text-sm font-semibold">{{ product.title }}</div>
+                                <div class="mt-1 text-xs text-slate-500">{{ product.brand|default:"-" }}</div>
+                            </div>
+                            {% if product.discounted_price %}
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-green-600">
+                                        {{ product.discounted_price|floatformat:2 }} €
+                                    </span>
+
+                                    <span class="text-xs line-through text-slate-400">
+                                        {{ product.price|floatformat:2 }} €
+                                    </span>
+
+                                    -10%
+                                </div>
+                            {% else %}
+                                <div class="text-sm font-bold text-ink-900">
+                                    {{ product.price|floatformat:2 }} €
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        
+
+
+                        <p class="mt-3 line-clamp-2 text-sm text-slate-600">{{ product.description|default:'No description' }}</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xs text-slate-500">Detalji →</span>
+                            <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-900 transition group-hover:bg-ink-900 group-hover:text-white">↗</span>
+                        </div>
+                        <div class="mt-3 flex items-center gap-4">
+                            <button class="like-btn flex items-center gap-1 text-sm text-slate-600 hover:text-green-600"
+                                    data-id="{{ product.id }}" data-action="like">
+                                👍 <span class="like-count">{{ product.likes_count }}</span>
+                            </button>
+
+                            <button class="like-btn flex items-center gap-1 text-sm text-slate-600 hover:text-red-600"
+                                    data-id="{{ product.id }}" data-action="dislike">
+                                👎 <span class="dislike-count">{{ product.dislikes_count }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="card p-6 text-sm text-slate-600">Nema rezultata za zadani upit. Pokušaj resetirati filtere.</div>
+        {% endif %}
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div class="card p-6">
+            <div class="text-sm font-semibold">Brza navigacija</div>
+            <p class="mt-2 text-sm text-slate-600">Najpopularnije kolekcije, sezonski dropovi i ekskluzive.</p>
+            <a href="#" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-ink-900 hover:underline">Pogledaj sve kategorije <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="card p-6">
+            <div class="text-sm font-semibold">Pomoć i podrška</div>
+            <p class="mt-2 text-sm text-slate-600">Pitanja o veličinama, dostavi ili povratu? Tu smo.</p>
+            <a href="#" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-ink-900 hover:underline">Kontaktiraj nas <span aria-hidden="true">→</span></a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/filters.js' %}"></script>
+
+<script>
+document.querySelectorAll(".like-btn").forEach(btn => {
+    btn.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+
+        const productId = btn.dataset.id;
+        const action = btn.dataset.action;
+
+        const response = await fetch(`/toggle-like/${productId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: new URLSearchParams({ action })
+        });
+
+        const data = await response.json();
+
+        if (data.status === "ok") {
+            btn.closest("div").querySelector(".like-count").textContent = data.likes;
+            btn.closest("div").querySelector(".dislike-count").textContent = data.dislikes;
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

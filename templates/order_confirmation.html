@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto">
+  <div class="flex flex-col gap-6">
+    <div class="card p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-5">
+        <div>
+          <div class="inline-flex items-center gap-2 text-emerald-700 font-semibold">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100">✓</span>
+            <span>Narudžba je uspješno zaprimljena</span>
+          </div>
+          <h1 class="mt-3 text-2xl md:text-3xl font-bold tracking-tight">Hvala na narudžbi!</h1>
+          <p class="mt-2 text-slate-600">Zaprimili smo tvoju narudžbu i uskoro krećemo s obradom.</p>
+        </div>
+
+        <div class="flex flex-col items-start md:items-end gap-2">
+          <div class="inline-flex items-center gap-2 rounded-full bg-ink-900 text-white px-4 py-2 text-sm">
+            <span class="opacity-80">Broj narudžbe</span>
+            <span id="orderNumberText" class="font-semibold">{{ order.order_number }}</span>
+          </div>
+          <div class="text-sm text-slate-500">Kreirano: {{ order.created_at|date:"d.m.Y H:i" }}</div>
+          <div class="text-sm text-slate-600">Status: <span class="font-semibold text-slate-900">{{ order.get_status_display }}</span></div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <button type="button" id="copyOrderNumberBtn" class="btn btn-ghost">Kopiraj broj</button>
+            <button type="button" id="printOrderBtn" class="btn btn-ghost">Ispiši</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="card p-6">
+          <div class="flex items-center justify-between gap-4">
+            <h2 class="text-sm font-semibold tracking-wide text-slate-700 uppercase">Stavke</h2>
+            <div class="text-sm text-slate-500">
+              {% if order_items %}
+                {{ order_items|length }} artikl(a)
+              {% else %}
+                1 artikl
+              {% endif %}
+            </div>
+          </div>
+
+          {% if order_items %}
+            <div class="mt-4 space-y-4">
+              {% for item in order_items %}
+                <div class="rounded-2xl border border-slate-200 p-4">
+                  <div class="flex flex-col sm:flex-row gap-5">
+                    <a href="{% url 'product_detail' item.product.pk %}" class="block w-full sm:w-44">
+                      <div class="aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden">
+                        <img
+                          src="{{ item.product.primary_image_url }}"
+                          alt="{{ item.product.title }}"
+                          class="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    </a>
+
+                    <div class="flex-1">
+                      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div>
+                          <div class="text-lg font-semibold text-slate-900">{{ item.product.title }}</div>
+                          <div class="mt-1 text-sm text-slate-600">Brand: <span class="font-medium text-slate-900">{{ item.product.brand|default:"-" }}</span></div>
+                        </div>
+
+                        <div class="text-right">
+                          <div class="text-sm text-slate-500">Cijena</div>
+                          <div class="text-lg font-bold text-slate-900">{{ item.total_price|floatformat:2 }} €</div>
+                          <div class="text-xs text-slate-500">({{ item.unit_price|floatformat:2 }} € × {{ item.quantity }})</div>
+                        </div>
+                      </div>
+
+                      <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="rounded-2xl border border-slate-200 p-3">
+                          <div class="text-xs text-slate-500">Veličina</div>
+                          <div class="mt-1 font-semibold text-slate-900">EU {{ item.size }}</div>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 p-3">
+                          <div class="text-xs text-slate-500">Boja</div>
+                          <div class="mt-1 font-semibold text-slate-900">{{ item.color|capfirst }}</div>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 p-3">
+                          <div class="text-xs text-slate-500">Količina</div>
+                          <div class="mt-1 font-semibold text-slate-900">{{ item.quantity }}</div>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 p-3">
+                          <div class="text-xs text-slate-500">Status</div>
+                          <div class="mt-2">
+                            <span class="inline-flex w-full items-center justify-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                              {{ item.get_status_display }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="mt-4 flex flex-col sm:flex-row gap-5">
+              <a href="{% url 'product_detail' order.product.pk %}" class="block w-full sm:w-44">
+                <div class="aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden">
+                  <img
+                    src="{{ order.product.primary_image_url }}"
+                    alt="{{ order.product.title }}"
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+
+              <div class="flex-1">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div>
+                    <div class="text-lg font-semibold text-slate-900">{{ order.product.title }}</div>
+                    <div class="mt-1 text-sm text-slate-600">Brand: <span class="font-medium text-slate-900">{{ order.product.brand|default:"-" }}</span></div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">Cijena</div>
+                    <div class="text-lg font-bold text-slate-900">{{ order.total_price|floatformat:2 }} €</div>
+                  </div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div class="rounded-2xl border border-slate-200 p-3">
+                    <div class="text-xs text-slate-500">Veličina</div>
+                    <div class="mt-1 font-semibold text-slate-900">EU {{ order.size }}</div>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 p-3">
+                    <div class="text-xs text-slate-500">Boja</div>
+                    <div class="mt-1 font-semibold text-slate-900">{{ order.color|capfirst }}</div>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 p-3">
+                    <div class="text-xs text-slate-500">Količina</div>
+                    <div class="mt-1 font-semibold text-slate-900">{{ order.quantity }}</div>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 p-3">
+                    <div class="text-xs text-slate-500">Status</div>
+                    <div class="mt-2">
+                      <span class="inline-flex w-full items-center justify-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        {{ order.get_status_display }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="mt-6 rounded-2xl bg-slate-50 border border-slate-200 p-4">
+            <div class="font-semibold text-slate-900">Što slijedi?</div>
+            <ul class="mt-2 space-y-1 text-sm text-slate-600 list-disc pl-5">
+              <li>Provjeravamo dostupnost i potvrđujemo narudžbu.</li>
+              <li>Poslat ćemo ti email potvrde na: <span class="font-semibold text-slate-900">{{ order.email }}</span></li>
+              <li>Kad pošaljemo paket, status će se ažurirati.</li>
+            </ul>
+          </div>
+        </div>
+
+        {% if order.notes %}
+          <div class="card p-6">
+            <h2 class="text-sm font-semibold tracking-wide text-slate-700 uppercase">Napomena</h2>
+            <p class="mt-3 text-sm text-slate-700 whitespace-pre-line">{{ order.notes }}</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <aside class="space-y-6">
+        <div class="card p-6">
+          <h2 class="text-sm font-semibold tracking-wide text-slate-700 uppercase">Sažetak</h2>
+
+          <div class="mt-4 space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-600">Međuzbroj</span>
+              <span class="font-semibold text-slate-900">{{ order_total|default:order.total_price|floatformat:2 }} €</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-600">Dostava</span>
+              <span class="font-semibold text-slate-900">{{ order.delivery_method_display }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-600">Plaćanje</span>
+              <span class="font-semibold text-slate-900">{{ order.payment_method_display }}</span>
+            </div>
+
+            {% if order.payment_method == 'card' and order.payment_card_last4 %}
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">Kartica</span>
+                <span class="font-semibold text-slate-900">{{ order.payment_card_brand|default:"Card" }} •••• {{ order.payment_card_last4 }}</span>
+              </div>
+            {% endif %}
+
+            <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
+              <span class="font-semibold text-slate-900">Ukupno</span>
+              <span class="text-xl font-extrabold tracking-tight text-slate-900">{{ order_total|default:order.total_price|floatformat:2 }} €</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-sm font-semibold tracking-wide text-slate-700 uppercase">Dostava</h2>
+          <div class="mt-4 space-y-1">
+            <div class="font-semibold text-slate-900">{{ order.full_name }}</div>
+            <div class="text-sm text-slate-600">{{ order.address }}</div>
+            <div class="text-sm text-slate-600">{{ order.postal_code }} {{ order.city }}</div>
+            <div class="pt-2 text-sm text-slate-600">Telefon: <span class="font-medium text-slate-900">{{ order.phone }}</span></div>
+          </div>
+        </div>
+
+        <div class="grid gap-2">
+          <a class="btn btn-primary" href="{% url 'home' %}">Natrag na katalog</a>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+    (function () {
+      const copyBtn = document.getElementById('copyOrderNumberBtn');
+      const printBtn = document.getElementById('printOrderBtn');
+      const textEl = document.getElementById('orderNumberText');
+
+      if (copyBtn && textEl) {
+        copyBtn.addEventListener('click', async () => {
+          const value = (textEl.textContent || '').trim();
+          if (!value) return;
+          try {
+            await navigator.clipboard.writeText(value);
+            copyBtn.textContent = 'Kopirano';
+            copyBtn.disabled = true;
+            setTimeout(() => {
+              copyBtn.textContent = 'Kopiraj broj';
+              copyBtn.disabled = false;
+            }, 1200);
+          } catch (e) {
+            // Fallback for older browsers
+            const ta = document.createElement('textarea');
+            ta.value = value;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'absolute';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand('copy');
+              copyBtn.textContent = 'Kopirano';
+              setTimeout(() => (copyBtn.textContent = 'Kopiraj broj'), 1200);
+            } finally {
+              document.body.removeChild(ta);
+            }
+          }
+        });
+      }
+
+      if (printBtn) {
+        printBtn.addEventListener('click', () => window.print());
+      }
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,11 @@
+Django==5.1.2
+gunicorn==22.0.0
+whitenoise==6.7.0
+psycopg[binary]==3.2.3
+dj-database-url==2.1.0
+Pillow==11.0.0
+firebase-admin==6.5.0
+
+# Development / Testing
+pytest>=7.4.0
+pytest-django>=4.5.0

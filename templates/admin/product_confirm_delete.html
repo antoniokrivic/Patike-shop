@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Obriši proizvod</h1>
+    <p class="mt-1 text-sm text-slate-600">Ova akcija se ne može poništiti.</p>
+  </div>
+  <a class="btn btn-ghost" href="{% url 'admin_product_list' %}">← Nazad</a>
+</div>
+
+<div class="mt-6 card p-5">
+  <p class="text-sm text-slate-700">Jesi siguran da želiš obrisati <span class="font-semibold">{{ product.title }}</span>?</p>
+
+  <form method="post" class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    {% csrf_token %}
+    <a class="btn btn-secondary" href="{% url 'admin_product_list' %}">Odustani</a>
+    <button type="submit" class="btn btn-danger">Da, obriši</button>
+  </form>
+</div>
+{% endblock %}

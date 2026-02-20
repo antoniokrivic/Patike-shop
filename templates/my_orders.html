@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="space-y-6">
+	<header class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+		<div>
+			<h1 class="text-xl font-bold tracking-tight">Moje narudžbe</h1>
+			<p class="mt-1 text-sm text-slate-600">Ovdje su sve tvoje narudžbe povezane s korisničkim računom.</p>
+		</div>
+		<a href="{% url 'home' %}" class="btn btn-ghost">Natrag na katalog</a>
+	</header>
+
+	{% if orders %}
+		<div class="card p-5">
+			<div class="space-y-3">
+				{% for order in orders %}
+					<a href="{% url 'order_confirmation' order.order_number %}" class="block rounded-2xl border border-slate-100 bg-white p-4 transition hover:border-slate-300">
+						<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<div class="flex items-center gap-3">
+								<div class="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+									<img src="{{ order.product.primary_image_url }}" alt="{{ order.product.title }}" class="h-full w-full object-cover">
+								</div>
+								<div>
+									<div class="text-xs font-semibold text-slate-900">{{ order.product.title }}</div>
+									<div class="mt-1 text-xs text-slate-500">Broj narudžbe: <span class="font-semibold text-slate-700">{{ order.order_number }}</span></div>
+									<div class="mt-1 text-xs text-slate-500">{{ order.created_at|date:"d.m.Y H:i" }} · {{ order.size }} · {{ order.color|capfirst }} · {{ order.quantity }} kom</div>
+								</div>
+							</div>
+							<div class="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
+								<span class="text-xs font-semibold text-slate-700">{{ order.get_status_display }}</span>
+								<span class="text-sm font-bold text-ink-900">{{ order.total_price|floatformat:2 }} €</span>
+							</div>
+						</div>
+					</a>
+				{% endfor %}
+			</div>
+		</div>
+	{% else %}
+		<div class="card p-6">
+			<p class="text-sm text-slate-600">Još nemaš nijednu narudžbu.</p>
+			<a href="{% url 'home' %}" class="btn btn-primary mt-4">Kreni u kupovinu</a>
+		</div>
+	{% endif %}
+</section>
+{% endblock %}

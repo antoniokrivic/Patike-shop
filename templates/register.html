@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="flex min-h-[60vh] items-center justify-center">
+    <div class="w-full max-w-md">
+        <div class="card p-6 sm:p-8">
+            <header class="mb-6 text-center">
+                <h1 class="text-xl font-bold tracking-tight">Registracija</h1>
+                <p class="mt-1 text-sm text-slate-600">Kreiraj račun i prati svoje narudžbe i košaricu na svim uređajima.</p>
+            </header>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div>
+                    <label class="mb-1 block text-xs font-semibold tracking-wide text-slate-700" for="{{ form.username.id_for_label }}">
+                        {{ form.username.label|default:'Korisničko ime' }}
+                    </label>
+                    <input
+                        type="text"
+                        name="{{ form.username.html_name }}"
+                        id="{{ form.username.id_for_label }}"
+                        value="{{ form.username.value|default_if_none:'' }}"
+                        class="input"
+                        autocomplete="username"
+                        required
+                    >
+                    {% if form.username.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-semibold tracking-wide text-slate-700" for="{{ form.email.id_for_label }}">
+                        {{ form.email.label|default:'Email' }}
+                    </label>
+                    <input
+                        type="email"
+                        name="{{ form.email.html_name }}"
+                        id="{{ form.email.id_for_label }}"
+                        value="{{ form.email.value|default_if_none:'' }}"
+                        class="input"
+                        autocomplete="email"
+                        required
+                    >
+                    {% if form.email.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-semibold tracking-wide text-slate-700" for="{{ form.referral_code.id_for_label }}">
+                        Referral code (opcionalno)
+                    </label>
+                    <input
+                        type="text"
+                        name="{{ form.referral_code.html_name }}"
+                        id="{{ form.referral_code.id_for_label }}"
+                        value="{{ form.referral_code.value|default_if_none:'' }}"
+                        class="input"
+                        autocomplete="off"
+                    >
+                    {% if form.referral_code.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.referral_code.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+
+                <div>
+                    <label class="mb-1 block text-xs font-semibold tracking-wide text-slate-700" for="{{ form.password1.id_for_label }}">
+                        {{ form.password1.label|default:'Lozinka' }}
+                    </label>
+                    <input
+                        type="password"
+                        name="{{ form.password1.html_name }}"
+                        id="{{ form.password1.id_for_label }}"
+                        class="input"
+                        autocomplete="new-password"
+                        required
+                    >
+                    {% if form.password1.help_text %}
+                        <p class="mt-1 text-xs text-slate-500">{{ form.password1.help_text|safe }}</p>
+                    {% endif %}
+                    {% if form.password1.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-semibold tracking-wide text-slate-700" for="{{ form.password2.id_for_label }}">
+                        {{ form.password2.label|default:'Ponovi lozinku' }}
+                    </label>
+                    <input
+                        type="password"
+                        name="{{ form.password2.html_name }}"
+                        id="{{ form.password2.id_for_label }}"
+                        class="input"
+                        autocomplete="new-password"
+                        required
+                    >
+                    {% if form.password2.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full">Registriraj se</button>
+            </form>
+
+            <p class="mt-4 text-center text-xs text-slate-600">
+                Već imaš račun?
+                <a href="{% url 'login' %}" class="font-semibold text-ink-900 underline">Prijavi se</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="rounded-3xl bg-gradient-to-r from-ink-900 via-slate-900 to-slate-800 p-6 text-white shadow-2xl ring-1 ring-white/10 sm:p-8">
+    <div class="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">ADMIN</p>
+        <h1 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{{ title }}</h1>
+        <p class="mt-2 max-w-2xl text-sm text-white/80">{{ subtitle }}</p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl bg-white/5 px-4 py-3 ring-1 ring-white/25">
+          <div class="text-[11px] uppercase tracking-[0.2em] text-white/60">Status</div>
+          <div class="mt-1 text-lg font-semibold">
+            {% if product and product.pk %}#{{ product.pk }} · Aktivno{% else %}U pripremi{% endif %}
+          </div>
+        </div>
+        <div class="rounded-2xl bg-white/5 px-4 py-3 ring-1 ring-white/25">
+          <div class="text-[11px] uppercase tracking-[0.2em] text-white/60">Zadnja izmjena</div>
+          <div class="mt-1 text-lg font-semibold">
+            {% if product and product.created_at %}
+              {{ product.created_at|date:"d.m.Y" }}
+            {% else %}
+              —
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a class="btn btn-ghost text-white hover:bg-white/10" href="{% url 'admin_product_list' %}">← Nazad</a>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-100">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div class="space-y-6 xl:col-span-2">
+        <div class="card p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-slate-900">Osnovne informacije</p>
+              <p class="mt-1 text-xs text-slate-500">Naziv, brand i cijena sada imaju više prostora i jasne oznake.</p>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Korak 1</span>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Naziv</label>
+              <div class="mt-2">{{ form.title }}</div>
+              {% if form.title.errors %}<div class="mt-1 text-xs text-red-600">{{ form.title.errors }}</div>{% endif %}
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Brand</label>
+              <div class="mt-2">{{ form.brand }}</div>
+              {% if form.brand.errors %}<div class="mt-1 text-xs text-red-600">{{ form.brand.errors }}</div>{% endif %}
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Cijena (€)</label>
+              <div class="mt-2">{{ form.price }}</div>
+              <p class="mt-2 text-xs text-slate-500">Koristi točku za decimale (npr. 129.99).</p>
+              {% if form.price.errors %}<div class="mt-1 text-xs text-red-600">{{ form.price.errors }}</div>{% endif %}
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Opis</label>
+              <div class="mt-2">{{ form.description }}</div>
+              {% if form.description.errors %}<div class="mt-1 text-xs text-red-600">{{ form.description.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-slate-900">Slike i mediji</p>
+              <p class="mt-1 text-xs text-slate-500">Odaberi upload ili URL. Upload ima prednost kad postaviš oba.</p>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Korak 2</span>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div>
+              <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Slika (upload)</label>
+              <div class="mt-2">{{ form.image }}</div>
+              {% if form.image.errors %}<div class="mt-1 text-xs text-red-600">{{ form.image.errors }}</div>{% endif %}
+              <p class="mt-2 text-xs text-slate-500">Preporuka: 1200×900 ili veće, JPG/PNG.</p>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Slika URL</label>
+              <div class="mt-2">{{ form.image_url }}</div>
+              {% if form.image_url.errors %}<div class="mt-1 text-xs text-red-600">{{ form.image_url.errors }}</div>{% endif %}
+              <p class="mt-2 text-xs text-slate-500">Npr. https://cdn.example.com/proizvod.jpg</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-6">
+          <p class="text-sm font-semibold text-slate-900">Smjernice za sadržaj</p>
+          <ul class="mt-4 space-y-2 list-disc pl-5 text-sm text-slate-600">
+            <li>Opiši ključne benefite u prve dvije rečenice.</li>
+            <li>Uključi brand i seriju u naziv radi lakšeg pretraživanja.</li>
+            <li>Provjeri da cijena odgovara onoj na web shopu.</li>
+            <li>Koristi slike bez watermarka za profesionalan izgled.</li>
+          </ul>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <a class="btn btn-secondary" href="{% url 'admin_product_list' %}">Odustani</a>
+          <button type="submit" class="btn btn-primary">Spremi promjene</button>
+        </div>
+      </div>
+
+      <aside class="space-y-6">
+        <div class="card p-6">
+          <p class="text-sm font-semibold text-slate-900">Live preview</p>
+          <p class="mt-1 text-xs text-slate-500">Pregled se osvježava s trenutačnim podacima obrasca.</p>
+
+          {% with preview_product=form.instance %}
+            <div class="mt-4 overflow-hidden rounded-2xl bg-slate-100">
+              {% if preview_product and preview_product.image %}
+                <img src="{{ preview_product.primary_image_url }}" alt="{{ preview_product.title|default:'Preview slika' }}" class="h-64 w-full object-cover">
+              {% elif preview_product and preview_product.image_url %}
+                <img src="{{ preview_product.primary_image_url }}" alt="{{ preview_product.title|default:'Preview slika' }}" class="h-64 w-full object-cover">
+              {% elif form.image_url.value %}
+                <img src="{{ form.image_url.value }}" alt="URL preview" class="h-64 w-full object-cover">
+              {% else %}
+                <div class="flex h-64 w-full items-center justify-center text-xs text-slate-500">Dodaj sliku za pregled</div>
+              {% endif %}
+            </div>
+            <div class="mt-4 space-y-1">
+              <h2 class="text-lg font-semibold text-slate-900">{{ form.title.value|default_if_none:'Novi proizvod'|default:'Novi proizvod' }}</h2>
+              <p class="text-sm text-slate-500">{{ form.description.value|default_if_none:'Opis će biti prikazan nakon spremanja.'|default:'Opis će biti prikazan nakon spremanja.' }}</p>
+            </div>
+            <dl class="mt-4 space-y-2 text-sm text-slate-600">
+              <div class="flex items-center justify-between">
+                <dt>Brand</dt>
+                <dd class="font-semibold text-slate-900">{{ form.brand.value|default_if_none:'—'|default:'—' }}</dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Cijena</dt>
+                <dd class="font-semibold text-slate-900">{% if form.price.value %}€ {{ form.price.value }}{% else %}—{% endif %}</dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Status</dt>
+                <dd><span class="badge">Admin</span></dd>
+              </div>
+            </dl>
+          {% endwith %}
+        </div>
+
+        <div class="card p-6">
+          <p class="text-sm font-semibold text-slate-900">Brzi pregled polja</p>
+          <div class="mt-4 space-y-3 text-sm text-slate-600">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Naziv</span>
+              <span class="font-semibold text-slate-900">{{ form.title.value|default_if_none:'—'|default:'—' }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Brand</span>
+              <span class="font-semibold text-slate-900">{{ form.brand.value|default_if_none:'—'|default:'—' }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Cijena</span>
+              <span class="font-semibold text-slate-900">{% if form.price.value %}€ {{ form.price.value }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Opis</span>
+              <span class="max-w-[180px] text-right">{{ form.description.value|default_if_none:'—'|default:'—' }}</span>
+            </div>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">Polja se ažuriraju dok tipkaš pa odmah vidiš osnovne podatke.</p>
+        </div>
+      </aside>
+    </div>
+  </form>
+</div>
+{% endblock %}

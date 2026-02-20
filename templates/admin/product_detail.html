@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Admin · {{ product.title }}</h1>
+    <p class="mt-1 text-sm text-slate-600">Pregled proizvoda.</p>
+  </div>
+  <div class="flex gap-2">
+    <a class="btn btn-ghost" href="{% url 'admin_product_list' %}">← Nazad</a>
+    <a class="btn btn-secondary" href="{% url 'admin_product_update' product.pk %}">Uredi</a>
+    <a class="btn btn-danger" href="{% url 'admin_product_delete' product.pk %}">Obriši</a>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-12">
+  <div class="lg:col-span-5">
+    <div class="card overflow-hidden">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="{{ product.primary_image_url }}" alt="{{ product.title }}" class="h-full w-full object-cover" />
+      </div>
+      <div class="p-4">
+        <div class="text-sm text-slate-600">ID: <span class="font-semibold text-slate-900">{{ product.id }}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lg:col-span-7">
+    <div class="card p-5">
+      <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-xs font-semibold tracking-wide text-slate-600">Naziv</dt>
+          <dd class="mt-1 text-sm font-semibold text-slate-900">{{ product.title }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold tracking-wide text-slate-600">Brand</dt>
+          <dd class="mt-1 text-sm text-slate-800">{{ product.brand|default:"-" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold tracking-wide text-slate-600">Cijena</dt>
+          <dd class="mt-1 text-sm font-semibold text-slate-900">{{ product.price|floatformat:2 }} €</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold tracking-wide text-slate-600">Kreirano</dt>
+          <dd class="mt-1 text-sm text-slate-800">{{ product.created_at }}</dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="text-xs font-semibold tracking-wide text-slate-600">Opis</dt>
+          <dd class="mt-2 text-sm text-slate-800 whitespace-pre-line">{{ product.description|default:"-" }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

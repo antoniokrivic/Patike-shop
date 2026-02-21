@@ -214,10 +214,10 @@ class Command(BaseCommand):
             },
         ]
 
-        def build_unsplash_image_url(brand: str, title: str) -> str:
+        def build_placeholder_image_url(brand: str, title: str) -> str:
             brand_slug = brand.lower().replace(' ', '-').replace("'", '')
             title_slug = title.lower().replace(' ', '-').replace("'", '')
-            return f"https://source.unsplash.com/800x600/?{brand_slug},{title_slug},sneakers"
+            return f"https://picsum.photos/seed/{brand_slug}-{title_slug}/800/600"
 
         created = 0
         for item in sample:
@@ -226,7 +226,7 @@ class Command(BaseCommand):
                 defaults={
                     'brand': item['brand'],
                     'price': item['price'],
-                    'image_url': item.get('image_url') or build_unsplash_image_url(item['brand'], item['title']),
+                    'image_url': item.get('image_url') or build_placeholder_image_url(item['brand'], item['title']),
                     'description': f"Primjer modela {item['title']} iz kolekcije {item['brand']}.",
                 }
             )

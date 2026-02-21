@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import BinaryIO, Optional
 
 import firebase_admin
 from firebase_admin import credentials, storage
+
+# Korijenski direktorij projekta (dva nivoa iznad shop/)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 @dataclass(frozen=True)
@@ -24,9 +28,15 @@ _app: Optional[firebase_admin.App] = None
 
 
 def load_firebase_storage_config() -> FirebaseStorageConfig:
-    service_account_path = (os.environ.get("FIREBASE_SERVICE_ACCOUNT_PATH") or "").strip()
+    raw_path = (os.environ.get("FIREBASE_SERVICE_ACCOUNT_PATH") or "").strip()
     bucket_name = (os.environ.get("FIREBASE_STORAGE_BUCKET") or "").strip()
     make_public = (os.environ.get("FIREBASE_STORAGE_PUBLIC", "1").strip() == "1")
+
+    # Ako je putanja relativna, razriješi je u odnosu na korijen projekta
+    if raw_path and not os.path.isabs(raw_path):
+        service_account_path = str(BASE_DIR / raw_path)
+    else:
+        service_account_path = raw_path
 
     if not service_account_path:
         raise RuntimeError(

@@ -5,6 +5,7 @@ psycopg[binary]==3.2.3
 dj-database-url==2.1.0
 Pillow==11.0.0
 firebase-admin==6.5.0
+python-dotenv==1.0.1
 
 # Development / Testing
 pytest>=7.4.0

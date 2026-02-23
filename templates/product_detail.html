@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static l10n %}
 
 {% block content %}
 <section class="space-y-6">
@@ -134,13 +134,13 @@
                             {% if discounted_price %}
                                 <strong class="text-lg font-bold text-ink-900"
                                         id="orderTotal"
-                                        data-unit-price="{{ discounted_price|floatformat:2 }}">
+                                        data-unit-price="{{ discounted_price|unlocalize }}">
                                     {{ discounted_price|floatformat:2 }} €
                                 </strong>
                             {% else %}
                                 <strong class="text-lg font-bold text-ink-900"
                                         id="orderTotal"
-                                        data-unit-price="{{ product.price|floatformat:2 }}">
+                                        data-unit-price="{{ product.price|unlocalize }}">
                                     {{ product.price|floatformat:2 }} €
                                 </strong>
                             {% endif %}

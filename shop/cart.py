@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Dict, Iterable, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 from django.http import HttpRequest
-from decimal import Decimal
 
 from .models import Product
 
@@ -43,7 +42,7 @@ class Cart:
         self._data: Dict[str, CartItemData] = self.session.get(self.SESSION_KEY, {})
 
     @staticmethod
-    def make_key(product_id: int, size: str, color: str) -> str:
+    def build_item_key(product_id: int, size: str, color: str) -> str:
         return f"{product_id}:{size}:{color}"
 
     def save(self) -> None:
@@ -58,7 +57,7 @@ class Cart:
         if quantity < 1:
             quantity = 1
 
-        key = self.make_key(product.id, size, color)
+        key = self.build_item_key(product.id, size, color)
         if key in self._data:
             self._data[key]['quantity'] += int(quantity)
         else:
@@ -67,7 +66,7 @@ class Cart:
             user = self.request.user 
             if user.is_authenticated and hasattr(user, "userprofile"): 
                 if user.userprofile.has_discount: 
-                    price = price * Decimal("0.9")
+                    price = (price * Decimal("0.9")).quantize(Decimal("0.01"))
             
             self._data[key] = { 
                 'product_id': int(product.id), 
@@ -120,7 +119,7 @@ class Cart:
             )
         return resolved
 
-    def count_items(self) -> int:
+    def get_item_count(self) -> int:
         return sum(int(item['quantity']) for item in self._data.values())
 
     def subtotal(self) -> Decimal:

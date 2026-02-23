@@ -20,5 +20,5 @@ urlpatterns = [
     path('cart/remove/<str:key>/', views.cart_remove, name='cart_remove'),
     path('cart/clear/', views.cart_clear, name='cart_clear'),
     path('checkout/', views.checkout, name='checkout'),
-    path("toggle-like/<int:product_id>/", views.toggle_like, name="toggle_like"),
+    path("toggle-like/<int:product_id>/", views.toggle_product_like, name="toggle_product_like"),
 ]

@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Min, Max
+from django.db.models import Q, Min, Max, Count
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -20,7 +20,6 @@ from .cart_forms import CartUpdateForm
 from .cart_add_forms import AddToCartForm
 from .admin_crud import admin_required
 from .admin_forms import ProductAdminForm
-from decimal import Decimal
 from .models import ProductLike
 
 from .firebase_storage import upload_fileobj_to_firebase
@@ -33,18 +32,19 @@ def logout_view(request):
 	return redirect('home')
 
 
-def generate_order_number() -> str:
+def _generate_order_number() -> str:
 	# Generira kratki broj narudžbe, npr. PS-9F3A1C2B
 	return f"PS-{uuid4().hex[:8].upper()}"
 
 
 
 
-def toggle_like(request, product_id):
+@require_POST
+def toggle_product_like(request, product_id):
     if not request.user.is_authenticated:
         return JsonResponse({"error": "not_authenticated"}, status=403)
 
-    product = Product.objects.get(id=product_id)
+    product = get_object_or_404(Product, id=product_id)
     action = request.POST.get("action")  
 
     like_obj, created = ProductLike.objects.get_or_create(
@@ -150,16 +150,17 @@ def home(request):
     if request.user.is_authenticated and hasattr(request.user, "userprofile"):
         discounted = request.user.userprofile.has_discount
 
+    # Broj lajkova/dislajkova (jedna anotacija umjesto N+1 upita).
+    products = products.annotate(
+        likes_count=Count('productlike', filter=Q(productlike__is_like=True)),
+        dislikes_count=Count('productlike', filter=Q(productlike__is_like=False)),
+    )
+
     for p in products:
         if discounted:
-            p.discounted_price = p.price * Decimal("0.9")
+            p.discounted_price = (p.price * Decimal("0.9")).quantize(Decimal("0.01"))
         else:
             p.discounted_price = None
-
-	# Broj lajkova/dislajkova (za prikaz na karticama).
-    for p in products:
-        p.likes_count = ProductLike.objects.filter(product=p, is_like=True).count()
-        p.dislikes_count = ProductLike.objects.filter(product=p, is_like=False).count()
 
 	# Lista brandova za dropdown filter.
     brands_qs = Product.objects.exclude(brand='').values_list('brand', flat=True).distinct()
@@ -212,33 +213,7 @@ def product_detail(request, pk):
     discounted_price = None
     if request.user.is_authenticated and hasattr(request.user, "userprofile"):
         if request.user.userprofile.has_discount:
-            discounted_price = product.price * Decimal("0.9")
-
-    if request.method == 'POST':
-        action = (request.POST.get('action') or '').strip()
-        if action not in {'add_to_cart', 'checkout'}:
-            action = 'add_to_cart'
-
-        form = ProductOrderForm(request.POST, mode='product')
-        if form.is_valid():
-            cleaned = form.cleaned_data
-            cart = Cart(request)
-            cart.add(
-                product=product,
-                size=str(cleaned.get('size') or ''),
-                color=str(cleaned.get('color') or 'black'),
-                quantity=int(cleaned.get('quantity') or 1),
-            )
-            messages.success(request, f"Dodano u košaricu: {product.title} (veličina {cleaned.get('size')})")
-
-            # Preusmjeravanje ovisno o akciji
-            if action == 'checkout' and request.user.is_authenticated:
-                return redirect('checkout')
-            if action == 'checkout':
-                login_url = f"{reverse('login')}?next={reverse('checkout')}"
-                return redirect(login_url)
-            return redirect('cart_detail')
-        # Ako forma nije validna, ponovo renderaj stranicu s greškama.
+            discounted_price = (product.price * Decimal("0.9")).quantize(Decimal("0.01"))
 
     context = {
         'product': product,
@@ -299,7 +274,7 @@ def cart_add(request, pk: int):
 			{
 				'ok': True,
 				'message': message,
-				'cartItemCount': cart.count_items(),
+				'cartItemCount': cart.get_item_count(),
 				'cartSubtotal': str(cart.subtotal()),
 			},
 		)
@@ -375,13 +350,12 @@ def checkout(request):
 					card_brand = 'Card'
 
 			# Kreira jednu grupu narudžbe (jedan order_number) s više Order redova.
-			order_number = generate_order_number()
+			order_number = _generate_order_number()
 			while Order.objects.filter(order_number=order_number).exists():
-				order_number = generate_order_number()
+				order_number = _generate_order_number()
 
-			last_order = None
 			for item in items:
-				last_order = Order.objects.create(
+				Order.objects.create(
 					user=request.user,
 					product=item.product,
 					order_number=order_number,
@@ -490,9 +464,7 @@ def register(request):
 				profile = user.userprofile
 				profile.has_discount = True
 				profile.save()
-				print("IMA POPUST")
 
-			print("--------", repr(referral), "--------------")
 			login(request, user)
 			messages.success(request, 'Registration successful. You are now logged in.')
 			return redirect('home')

@@ -38,10 +38,6 @@ class CustomUserCreationForm(UserCreationForm):
             classes = (existing + ' form-control').strip()
             field.widget.attrs.update({'class': classes})
 
-    class CustomUserCreationForm(UserCreationForm):
-        email = forms.EmailField(required=False)
-        referral_code = forms.CharField(required=False, max_length=50, label="Referral code")
-
 
 
 class ProductOrderForm(forms.Form):
@@ -99,8 +95,7 @@ class ProductOrderForm(forms.Form):
             # Stavke košarice već sadrže veličinu/boju/količinu po stavci.
             # Checkout forma prikuplja samo podatke o dostavi/plaćanju.
             for name in ['size', 'color', 'quantity']:
-                if name in self.fields:
-                    self.fields[name].required = False
+                self.fields.pop(name, None)
         for field_name, field in self.fields.items():
             widget = field.widget
             if isinstance(widget, forms.RadioSelect):

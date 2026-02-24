@@ -173,6 +173,5 @@ class ProductOrderForm(forms.Form):
 
             return cleaned
 
-		# Nepoznata metoda: budi strog i prikaži grešku
         self.add_error('payment_method', 'Nepoznata metoda plaćanja.')
         return cleaned
